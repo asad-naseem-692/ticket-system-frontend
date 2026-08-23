@@ -49,12 +49,20 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
     reqHeaders["Content-Type"] = "application/json";
   }
 
-  const response = await fetch(url, {
-    ...customConfig,
-    headers: reqHeaders,
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...customConfig,
+      headers: reqHeaders,
+    });
+  } catch (netErr: any) {
+    throw new ApiErrorResponse(
+      0,
+      `Cannot connect to backend server at ${API_BASE_URL}. Ensure the backend is running.`
+    );
+  }
 
-  if (response.status === 401) {
+  if (response.status === 401 && !endpoint.includes("/login")) {
     clearAuthSession();
     if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
       window.location.href = "/login";
