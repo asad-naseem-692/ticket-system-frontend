@@ -4,6 +4,8 @@ import React, { useState, useRef } from "react";
 import { Paperclip, Upload, Download, FileText, FileImage, File, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Attachment } from "@/lib/types";
 import { getStoredToken } from "@/lib/auth";
+import { Card, CardHeader, CardBody } from "./ui/Card";
+import { Button } from "./ui/Button";
 
 interface AttachmentUploaderProps {
   ticketId: string;
@@ -121,36 +123,38 @@ export default function AttachmentUploader({
   const getFileIcon = (filename: string) => {
     const ext = filename.split(".").pop()?.toLowerCase();
     if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext || "")) {
-      return <FileImage className="w-4 h-4 text-emerald-500 shrink-0" />;
+      return <FileImage className="w-4 h-4 text-[#0D9488] shrink-0" />;
     }
     if (["pdf", "txt", "docx", "xlsx", "csv"].includes(ext || "")) {
       return <FileText className="w-4 h-4 text-blue-500 shrink-0" />;
     }
-    return <File className="w-4 h-4 text-slate-500 shrink-0" />;
+    return <File className="w-4 h-4 text-[#9AA5B1] shrink-0" />;
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-4">
+    <Card className="shadow-card p-4 sm:p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Paperclip className="w-5 h-5 text-indigo-600" />
-          <h2 className="text-base font-semibold text-slate-900">Attachments & Documents</h2>
-          <span className="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-lg bg-teal-50 text-[#0D9488]">
+            <Paperclip className="w-4 h-4" />
+          </div>
+          <h2 className="text-base font-semibold text-[#1F2933]">Attachments & Documents</h2>
+          <span className="text-xs bg-slate-100 text-[#52606D] font-bold px-2 py-0.5 rounded-lg">
             {attachments.length}
           </span>
         </div>
       </div>
 
       {error && (
-        <div className="p-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+        <div className="p-3 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="p-3 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2">
+        <div className="p-3 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 rounded-xl flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           <span>{success}</span>
         </div>
@@ -159,69 +163,66 @@ export default function AttachmentUploader({
       {/* Attachment List */}
       <div className="space-y-2">
         {attachments.length === 0 ? (
-          <div className="text-center py-4 text-slate-400 text-xs">
+          <div className="text-center py-4 text-[#9AA5B1] text-xs">
             No files attached to this ticket.
           </div>
         ) : (
           attachments.map((att) => (
             <div
               key={att.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs hover:bg-slate-100/80 transition"
+              className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-[#E4E7EB] text-xs hover:bg-slate-100/80 transition"
             >
               <div className="flex items-center gap-2.5 overflow-hidden">
                 {getFileIcon(att.filename)}
                 <div className="overflow-hidden">
-                  <p className="font-medium text-slate-800 truncate" title={att.filename}>
+                  <p className="font-medium text-[#1F2933] truncate" title={att.filename}>
                     {att.filename}
                   </p>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-[#9AA5B1]">
                     {formatFileSize(att.size_bytes)} • Uploaded by {att.uploader?.name || "User"} on{" "}
                     {new Date(att.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>
 
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => handleDownload(att)}
                 disabled={downloadingId === att.id}
-                className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium px-2.5 py-1 rounded bg-white border border-slate-200 hover:border-slate-300 shadow-sm shrink-0 transition"
+                leftIcon={downloadingId === att.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5 text-[#0D9488]" />}
+                className="shrink-0"
               >
-                {downloadingId === att.id ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Download className="w-3.5 h-3.5" />
-                )}
                 <span>{downloadingId === att.id ? "Downloading..." : "Download"}</span>
-              </button>
+              </Button>
             </div>
           ))
         )}
       </div>
 
       {/* Upload Zone */}
-      <form onSubmit={handleUpload} className="pt-2 border-t border-slate-100 space-y-3">
+      <form onSubmit={handleUpload} className="pt-3 border-t border-[#E4E7EB] space-y-3">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <input
             ref={fileInputRef}
             type="file"
             onChange={handleFileChange}
-            className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+            className="block w-full text-xs text-[#52606D] file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#0D9488] hover:file:bg-teal-100 cursor-pointer"
           />
 
-          <button
+          <Button
             type="submit"
-            disabled={uploading || !selectedFile}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-medium text-xs rounded-lg shadow-sm transition shrink-0"
+            variant="primary"
+            size="sm"
+            loading={uploading}
+            disabled={!selectedFile}
+            leftIcon={<Upload className="w-3.5 h-3.5" />}
+            className="w-full sm:w-auto shrink-0"
           >
-            {uploading ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Upload className="w-3.5 h-3.5" />
-            )}
-            <span>{uploading ? "Uploading..." : "Attach File"}</span>
-          </button>
+            {uploading ? "Uploading..." : "Attach File"}
+          </Button>
         </div>
       </form>
-    </div>
+    </Card>
   );
 }

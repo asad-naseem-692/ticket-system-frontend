@@ -51,10 +51,10 @@ export default function SLACountdown({
   if (isResolvedOrClosed) {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 font-medium rounded-full ${
+        className={`inline-flex items-center gap-1.5 font-medium rounded-lg ${
           slaBreached
-            ? "bg-red-50 text-red-700 border border-red-200"
-            : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+            ? "bg-red-50 text-[#DC2626] border border-red-200/80"
+            : "bg-emerald-50 text-[#059669] border border-emerald-200/80"
         } ${compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"}`}
       >
         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -66,11 +66,11 @@ export default function SLACountdown({
   if (isOverdue) {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 font-bold rounded-full bg-red-100 text-red-800 border border-red-300 animate-pulse ${
+        className={`inline-flex items-center gap-1.5 font-semibold rounded-lg bg-red-50 text-[#DC2626] border border-red-200/80 ${
           compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
         }`}
       >
-        <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+        <AlertTriangle className="w-3.5 h-3.5 text-[#DC2626] shrink-0" />
         <span>SLA Breached (+{formatDuration(timeLeftMs)} overdue)</span>
       </div>
     );
@@ -79,11 +79,11 @@ export default function SLACountdown({
   if (isAtRisk) {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 font-semibold rounded-full bg-amber-100 text-amber-900 border border-amber-300 ${
+        className={`inline-flex items-center gap-1.5 font-medium rounded-lg bg-amber-50 text-[#D97706] border border-amber-200/80 ${
           compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
         }`}
       >
-        <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 animate-bounce" />
+        <AlertCircle className="w-3.5 h-3.5 text-[#D97706] shrink-0" />
         <span>{formatDuration(timeLeftMs)} left (At Risk)</span>
       </div>
     );
@@ -91,11 +91,11 @@ export default function SLACountdown({
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 font-medium rounded-full bg-blue-50 text-blue-700 border border-blue-200 ${
+      className={`inline-flex items-center gap-1.5 font-medium rounded-lg bg-blue-50 text-[#2563EB] border border-blue-200/80 ${
         compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
       }`}
     >
-      <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+      <Clock className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
       <span>{formatDuration(timeLeftMs)} remaining</span>
     </div>
   );

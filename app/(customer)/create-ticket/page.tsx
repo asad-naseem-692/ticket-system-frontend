@@ -3,9 +3,14 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
+import { Card, CardBody } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
 import { Ticket } from "@/lib/types";
 
@@ -98,136 +103,96 @@ export default function CreateTicketPage() {
 
   return (
     <AuthGuard allowedRoles={["customer", "admin"]}>
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-[#FAFAFA]">
         <Header />
-        <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fadeIn">
           <div className="flex items-center space-x-3">
             <Link
               href="/my-tickets"
-              className="inline-flex items-center justify-center p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition"
+              className="inline-flex items-center justify-center p-2 rounded-xl text-[#52606D] hover:text-[#1F2933] bg-white border border-[#E4E7EB] hover:bg-slate-50 transition shadow-sm"
               aria-label="Back to tickets"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Create Support Ticket</h1>
-              <p className="text-sm text-slate-500">
+              <h1 className="text-2xl font-bold text-[#1F2933] tracking-tight">Create Support Ticket</h1>
+              <p className="text-sm text-[#52606D]">
                 Submit a new complaint or issue. Our automated system will score its priority and calculate SLA deadlines.
               </p>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
-            {error && (
-              <div className="p-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
-                <span className="font-semibold text-red-800">Error:</span>
-                <span>{error}</span>
-              </div>
-            )}
+          <Card className="shadow-card">
+            <CardBody className="p-6 sm:p-8 space-y-6">
+              {error && (
+                <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{error}</span>
+                </div>
+              )}
 
-            {success && (
-              <div className="p-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start space-x-2">
-                <span className="font-semibold text-emerald-800">Success:</span>
-                <span>{success}</span>
-              </div>
-            )}
+              {success && (
+                <div className="p-3.5 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 rounded-xl flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{success}</span>
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Subject / Title <span className="text-red-500">*</span>
-                </label>
-                <input
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <Input
+                  label="Subject / Title *"
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g. Cannot access billing statements or invoices"
                   required
-                  className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 />
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Category <span className="text-red-500">*</span>
-                </label>
-                <select
+                <Select
+                  label="Category *"
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
+                  helperText="Select the closest category to ensure proper automated prioritization and SLA assignment."
                   required
-                  className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
                     </option>
                   ))}
-                </select>
-                <p className="mt-1 text-xs text-slate-500">
-                  Select the closest category to ensure proper automated prioritization and SLA assignment.
-                </p>
-              </div>
+                </Select>
 
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Detailed Description <span className="text-red-500">*</span>
-                </label>
-                <textarea
+                <Textarea
+                  label="Detailed Description *"
                   name="description"
                   rows={5}
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="Describe the issue in detail, including error messages, steps to reproduce, and impacted systems..."
                   required
-                  className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 />
-              </div>
 
-              <div className="pt-2 flex items-center justify-end space-x-3 border-t border-slate-100">
-                <Link
-                  href="/my-tickets"
-                  className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition"
-                >
-                  Cancel
-                </Link>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium text-sm rounded-lg transition duration-150 shadow-sm flex items-center justify-center space-x-2"
-                >
-                  {loading ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8H4z"
-                        ></path>
-                      </svg>
-                      <span>Submitting ticket...</span>
-                    </>
-                  ) : (
-                    <span>Submit Ticket</span>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+                <div className="pt-3 flex items-center justify-end space-x-3 border-t border-[#E4E7EB]">
+                  <Link href="/my-tickets">
+                    <Button variant="secondary" size="md" type="button">
+                      Cancel
+                    </Button>
+                  </Link>
+
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="md"
+                    loading={loading}
+                  >
+                    {loading ? "Submitting ticket..." : "Submit Ticket"}
+                  </Button>
+                </div>
+              </form>
+            </CardBody>
+          </Card>
         </main>
       </div>
     </AuthGuard>

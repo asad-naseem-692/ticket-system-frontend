@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { MessageSquare, Lock, Send, AlertCircle, ShieldAlert, CheckCircle2, User as UserIcon } from "lucide-react";
+import { MessageSquare, Lock, Send, AlertCircle, User as UserIcon } from "lucide-react";
 import { Comment, CommentVisibility } from "@/lib/types";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
 import { getStoredUser } from "@/lib/auth";
+import { Card, CardHeader, CardBody } from "./ui/Card";
+import { Button } from "./ui/Button";
 
 interface CommentBoxProps {
   ticketId: string;
@@ -55,31 +57,33 @@ export default function CommentBox({ ticketId, comments, onCommentAdded }: Comme
   const getRoleBadge = (role?: string) => {
     switch (role) {
       case "admin":
-        return <span className="bg-purple-100 text-purple-800 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase">Admin</span>;
+        return <span className="bg-purple-50 text-purple-700 border border-purple-200/80 text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase">Admin</span>;
       case "agent":
-        return <span className="bg-blue-100 text-blue-800 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase">Support Agent</span>;
+        return <span className="bg-teal-50 text-[#0D9488] border border-teal-200/80 text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase">Support Agent</span>;
       default:
-        return <span className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase">Customer</span>;
+        return <span className="bg-slate-50 text-[#52606D] border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase">Customer</span>;
     }
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <Card className="shadow-card overflow-hidden">
       {/* Header */}
-      <div className="p-4 sm:px-6 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-blue-600" />
-          <h2 className="text-base font-semibold text-slate-900">Conversation & Replies</h2>
-          <span className="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">
+      <CardHeader className="p-4 sm:px-6">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-lg bg-teal-50 text-[#0D9488]">
+            <MessageSquare className="w-4 h-4" />
+          </div>
+          <h2 className="text-base font-semibold text-[#1F2933]">Conversation & Replies</h2>
+          <span className="text-xs bg-slate-100 text-[#52606D] font-bold px-2 py-0.5 rounded-lg">
             {comments.length}
           </span>
         </div>
-      </div>
+      </CardHeader>
 
       {/* Messages Thread */}
-      <div className="p-4 sm:p-6 space-y-4 max-h-[500px] overflow-y-auto">
+      <CardBody className="p-4 sm:p-6 space-y-4 max-h-[500px] overflow-y-auto">
         {comments.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-sm">
+          <div className="text-center py-8 text-[#9AA5B1] text-xs">
             No replies yet. Start the conversation below.
           </div>
         ) : (
@@ -90,19 +94,19 @@ export default function CommentBox({ ticketId, comments, onCommentAdded }: Comme
                 key={comment.id}
                 className={`rounded-xl p-4 transition text-sm space-y-2 border ${
                   isInternal
-                    ? "bg-amber-50/70 border-amber-200 text-amber-950"
-                    : "bg-slate-50 border-slate-200 text-slate-800"
+                    ? "bg-amber-50/60 border-amber-200/80 text-amber-950"
+                    : "bg-slate-50 border-[#E4E7EB] text-[#1F2933]"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
-                      isInternal ? "bg-amber-200 text-amber-900" : "bg-blue-100 text-blue-700"
+                  <div className="flex items-center gap-2.5">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
+                      isInternal ? "bg-amber-200 text-amber-900" : "bg-teal-100 text-[#0D9488]"
                     }`}>
                       {comment.author?.name ? comment.author.name[0].toUpperCase() : <UserIcon className="w-4 h-4" />}
                     </div>
                     <div>
-                      <span className="font-semibold text-slate-900 text-xs sm:text-sm">
+                      <span className="font-semibold text-[#1F2933] text-xs sm:text-sm">
                         {comment.author?.name || "User"}
                       </span>
                       <span className="ml-2">{getRoleBadge(comment.author?.role)}</span>
@@ -111,12 +115,12 @@ export default function CommentBox({ ticketId, comments, onCommentAdded }: Comme
 
                   <div className="flex items-center gap-2">
                     {isInternal && (
-                      <span className="inline-flex items-center gap-1 bg-amber-200 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md">
                         <Lock className="w-3 h-3" />
                         Internal Staff Note
                       </span>
                     )}
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-[#9AA5B1]">
                       {new Date(comment.created_at).toLocaleString("en-US", {
                         dateStyle: "short",
                         timeStyle: "short",
@@ -125,19 +129,19 @@ export default function CommentBox({ ticketId, comments, onCommentAdded }: Comme
                   </div>
                 </div>
 
-                <div className="text-slate-800 leading-relaxed whitespace-pre-wrap pl-9">
+                <div className="text-[#1F2933] leading-relaxed whitespace-pre-wrap pl-9">
                   {comment.content}
                 </div>
               </div>
             );
           })
         )}
-      </div>
+      </CardBody>
 
       {/* Reply Submission Box */}
-      <form onSubmit={handleSubmit} className="p-4 sm:p-6 border-t border-slate-100 bg-slate-50/50 space-y-3">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-6 border-t border-[#E4E7EB] bg-slate-50/50 space-y-3">
         {error && (
-          <div className="p-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+          <div className="p-3 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
             <span>{error}</span>
           </div>
@@ -150,8 +154,8 @@ export default function CommentBox({ ticketId, comments, onCommentAdded }: Comme
               onClick={() => setVisibility("public")}
               className={`px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
                 visibility === "public"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                  ? "bg-[#0D9488] text-white shadow-sm"
+                  : "bg-white text-[#52606D] border border-[#E4E7EB] hover:bg-slate-50"
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
@@ -164,7 +168,7 @@ export default function CommentBox({ ticketId, comments, onCommentAdded }: Comme
               className={`px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
                 visibility === "internal"
                   ? "bg-amber-600 text-white shadow-sm"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                  : "bg-white text-[#52606D] border border-[#E4E7EB] hover:bg-slate-50"
               }`}
             >
               <Lock className="w-3.5 h-3.5" />
@@ -183,25 +187,28 @@ export default function CommentBox({ ticketId, comments, onCommentAdded }: Comme
                 ? "Write a private note for staff members..."
                 : "Type your reply to the customer / agent..."
             }
-            className="w-full p-3 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-y"
+            className="w-full p-3.5 text-sm text-[#1F2933] rounded-xl border border-[#E4E7EB] bg-white focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 transition resize-y placeholder-[#9AA5B1]"
           />
         </div>
 
         <div className="flex justify-end">
-          <button
+          <Button
             type="submit"
-            disabled={submitting || !content.trim()}
-            className={`inline-flex items-center gap-2 px-4 py-2 font-medium text-sm rounded-lg shadow-sm text-white transition disabled:opacity-50 ${
-              visibility === "internal"
-                ? "bg-amber-600 hover:bg-amber-700"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            variant={visibility === "internal" ? "secondary" : "primary"}
+            size="sm"
+            loading={submitting}
+            disabled={!content.trim()}
+            rightIcon={<Send className="w-3.5 h-3.5" />}
+            className={visibility === "internal" ? "bg-amber-600 hover:bg-amber-700 text-white border-none" : ""}
           >
-            <Send className="w-4 h-4" />
-            <span>{submitting ? "Sending..." : visibility === "internal" ? "Post Internal Note" : "Send Public Reply"}</span>
-          </button>
+            {submitting
+              ? "Sending..."
+              : visibility === "internal"
+              ? "Post Internal Note"
+              : "Send Public Reply"}
+          </Button>
         </div>
       </form>
-    </div>
+    </Card>
   );
 }
