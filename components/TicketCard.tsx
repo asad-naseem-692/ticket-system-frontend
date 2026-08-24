@@ -1,9 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import { Clock, AlertTriangle, ChevronRight, Tag } from "lucide-react";
+import { ChevronRight, Tag } from "lucide-react";
 import { Ticket } from "@/lib/types";
 import PriorityBadge from "./PriorityBadge";
 import StatusBadge from "./StatusBadge";
+import SLACountdown from "./SLACountdown";
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -12,21 +13,7 @@ interface TicketCardProps {
 
 export default function TicketCard({ ticket, href }: TicketCardProps) {
   const createdDate = new Date(ticket.created_at);
-  const deadlineDate = new Date(ticket.deadline_at);
-  const now = new Date();
-
-  const isOverdue =
-    ticket.sla_breached ||
-    (deadlineDate < now && ticket.status !== "resolved" && ticket.status !== "closed");
-
   const formattedCreated = createdDate.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  const formattedDeadline = deadlineDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -69,17 +56,12 @@ export default function TicketCard({ ticket, href }: TicketCardProps) {
 
       <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2">
-          {isOverdue ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-100 text-red-700 font-semibold border border-red-200">
-              <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
-              SLA Breached ({formattedDeadline})
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              SLA Deadline: {formattedDeadline}
-            </span>
-          )}
+          <SLACountdown
+            deadlineAt={ticket.deadline_at}
+            status={ticket.status}
+            slaBreached={ticket.sla_breached}
+            compact={true}
+          />
         </div>
 
         <Link

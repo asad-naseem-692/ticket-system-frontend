@@ -23,6 +23,7 @@ import PriorityBadge from "@/components/PriorityBadge";
 import StatusBadge from "@/components/StatusBadge";
 import CommentBox from "@/components/CommentBox";
 import AttachmentUploader from "@/components/AttachmentUploader";
+import SLACountdown from "@/components/SLACountdown";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
 import { getStoredUser, getRedirectPathForRole } from "@/lib/auth";
 import { Ticket, TicketStatus, TicketPriority, User } from "@/lib/types";
@@ -272,31 +273,26 @@ export default function TicketDetailPage() {
                 <div
                   className={`p-4 rounded-xl border text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
                     isOverdue
-                      ? "bg-red-50 border-red-200 text-red-800"
-                      : "bg-blue-50 border-blue-200 text-blue-800"
+                      ? "bg-red-50/70 border-red-200"
+                      : "bg-blue-50/70 border-blue-200"
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    {isOverdue ? (
-                      <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
-                    ) : (
-                      <Clock className="w-5 h-5 text-blue-600 shrink-0" />
-                    )}
-                    <div>
-                      <p className="font-semibold">
-                        {isOverdue ? "SLA Breached" : "SLA Resolution Deadline"}
-                      </p>
-                      <p className="text-xs opacity-90">
-                        Must be resolved by:{" "}
-                        {new Date(ticket.deadline_at).toLocaleString("en-US", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <SLACountdown
+                      deadlineAt={ticket.deadline_at}
+                      status={ticket.status}
+                      slaBreached={ticket.sla_breached}
+                    />
+                    <span className="text-xs text-slate-500 hidden sm:inline">
+                      Deadline:{" "}
+                      {new Date(ticket.deadline_at).toLocaleString("en-US", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </span>
                   </div>
 
-                  <div className="text-xs text-slate-600 bg-white/80 px-3 py-1.5 rounded-lg border border-slate-200">
+                  <div className="text-xs text-slate-600 bg-white/80 px-3 py-1.5 rounded-lg border border-slate-200 shrink-0">
                     Created:{" "}
                     {new Date(ticket.created_at).toLocaleString("en-US", {
                       dateStyle: "medium",
