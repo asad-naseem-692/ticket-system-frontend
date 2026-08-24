@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Bell, AlertTriangle, AlertCircle, Check, Clock, CheckCircle2 } from "lucide-react";
+import { Bell, AlertTriangle, AlertCircle, Clock, ShieldCheck } from "lucide-react";
 import { getStoredUser, clearAuthSession } from "@/lib/auth";
 import { apiClient } from "@/lib/api";
 import { Notification } from "@/lib/types";
@@ -88,56 +88,56 @@ export default function Header() {
   const getRoleBadgeColor = (role?: string) => {
     switch (role) {
       case "admin":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "bg-purple-50 text-purple-700 border-purple-200";
       case "agent":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-teal-50 text-[#0D9488] border-teal-200";
       case "customer":
       default:
-        return "bg-slate-100 text-slate-800 border-slate-200";
+        return "bg-slate-50 text-[#52606D] border-[#E4E7EB]";
     }
   };
 
   const getNotifIcon = (type: string) => {
     if (type === "sla_breach") {
-      return <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />;
+      return <AlertTriangle className="w-4 h-4 text-[#DC2626] shrink-0 mt-0.5" />;
     }
     if (type === "sla_warning") {
-      return <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />;
+      return <AlertCircle className="w-4 h-4 text-[#F97316] shrink-0 mt-0.5" />;
     }
-    return <Clock className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />;
+    return <Clock className="w-4 h-4 text-[#0D9488] shrink-0 mt-0.5" />;
   };
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <header className="bg-white border-b border-[#E4E7EB] sticky top-0 z-30 shadow-[0_1px_2px_0_rgba(0,0,0,0.02)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <Link href="/" className="flex items-center space-x-2 font-bold text-slate-900 text-lg">
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white text-sm font-bold shadow-sm">
-              CS
+          <Link href="/" className="flex items-center space-x-2.5 font-bold text-[#1F2933] text-lg tracking-tight">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#0D9488] text-white text-sm font-bold shadow-sm">
+              <ShieldCheck className="w-5 h-5" />
             </span>
             <span>SupportOps</span>
           </Link>
 
           {user && (
-            <nav className="hidden md:flex items-center space-x-4">
+            <nav className="hidden md:flex items-center space-x-1">
               {user.role === "customer" && (
                 <>
                   <Link
                     href="/my-tickets"
-                    className={`text-sm font-medium px-3 py-1.5 rounded-md transition ${
+                    className={`text-sm font-medium px-3 py-1.5 rounded-lg transition duration-150 ${
                       pathname === "/my-tickets"
-                        ? "bg-slate-100 text-blue-600"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "bg-teal-50 text-[#0D9488] font-semibold"
+                        : "text-[#52606D] hover:text-[#1F2933] hover:bg-slate-50"
                     }`}
                   >
                     My Tickets
                   </Link>
                   <Link
                     href="/create-ticket"
-                    className={`text-sm font-medium px-3 py-1.5 rounded-md transition ${
+                    className={`text-sm font-medium px-3 py-1.5 rounded-lg transition duration-150 ${
                       pathname === "/create-ticket"
-                        ? "bg-slate-100 text-blue-600"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "bg-teal-50 text-[#0D9488] font-semibold"
+                        : "text-[#52606D] hover:text-[#1F2933] hover:bg-slate-50"
                     }`}
                   >
                     New Ticket
@@ -148,10 +148,10 @@ export default function Header() {
               {user.role === "agent" && (
                 <Link
                   href="/assigned-tickets"
-                  className={`text-sm font-medium px-3 py-1.5 rounded-md transition ${
+                  className={`text-sm font-medium px-3 py-1.5 rounded-lg transition duration-150 ${
                     pathname === "/assigned-tickets"
-                      ? "bg-slate-100 text-blue-600"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-teal-50 text-[#0D9488] font-semibold"
+                      : "text-[#52606D] hover:text-[#1F2933] hover:bg-slate-50"
                   }`}
                 >
                   Assigned Tickets
@@ -162,20 +162,20 @@ export default function Header() {
                 <>
                   <Link
                     href="/all-tickets"
-                    className={`text-sm font-medium px-3 py-1.5 rounded-md transition ${
+                    className={`text-sm font-medium px-3 py-1.5 rounded-lg transition duration-150 ${
                       pathname === "/all-tickets"
-                        ? "bg-slate-100 text-blue-600"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "bg-teal-50 text-[#0D9488] font-semibold"
+                        : "text-[#52606D] hover:text-[#1F2933] hover:bg-slate-50"
                     }`}
                   >
                     All Tickets
                   </Link>
                   <Link
                     href="/reports"
-                    className={`text-sm font-medium px-3 py-1.5 rounded-md transition ${
+                    className={`text-sm font-medium px-3 py-1.5 rounded-lg transition duration-150 ${
                       pathname === "/reports"
-                        ? "bg-slate-100 text-blue-600"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "bg-teal-50 text-[#0D9488] font-semibold"
+                        : "text-[#52606D] hover:text-[#1F2933] hover:bg-slate-50"
                     }`}
                   >
                     Reports & SLA
@@ -192,24 +192,25 @@ export default function Header() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+                className="relative p-2 text-[#52606D] hover:text-[#1F2933] hover:bg-slate-100 rounded-lg transition"
                 title="Notifications"
+                aria-label="View notifications"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#DC2626] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse shadow-sm">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
               </button>
 
               {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                  <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#E4E7EB] rounded-xl shadow-dropdown z-50 overflow-hidden animate-fadeIn">
+                  <div className="p-3.5 bg-slate-50/80 border-b border-[#E4E7EB] flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm text-slate-900">Notifications</span>
+                      <span className="font-semibold text-sm text-[#1F2933]">Notifications</span>
                       {unreadCount > 0 && (
-                        <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                        <span className="bg-red-50 text-[#DC2626] border border-red-200/80 text-[11px] font-bold px-2 py-0.5 rounded-full">
                           {unreadCount} unread
                         </span>
                       )}
@@ -217,16 +218,16 @@ export default function Header() {
                     {unreadCount > 0 && (
                       <button
                         onClick={handleMarkAllRead}
-                        className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                        className="text-xs text-[#0D9488] hover:text-[#0F766E] font-medium"
                       >
                         Mark all as read
                       </button>
                     )}
                   </div>
 
-                  <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                  <div className="max-h-80 overflow-y-auto divide-y divide-[#E4E7EB]">
                     {notifications.length === 0 ? (
-                      <div className="p-6 text-center text-xs text-slate-400">
+                      <div className="p-6 text-center text-xs text-[#9AA5B1]">
                         No notifications yet.
                       </div>
                     ) : (
@@ -235,15 +236,15 @@ export default function Header() {
                           key={notif.id}
                           onClick={() => handleNotificationClick(notif)}
                           className={`p-3.5 flex items-start gap-3 cursor-pointer hover:bg-slate-50 transition text-xs ${
-                            !notif.read ? "bg-blue-50/40" : ""
+                            !notif.read ? "bg-teal-50/30" : ""
                           }`}
                         >
                           {getNotifIcon(notif.type)}
                           <div className="flex-1 space-y-1">
-                            <p className={`text-slate-800 leading-snug ${!notif.read ? "font-semibold" : ""}`}>
+                            <p className={`text-[#1F2933] leading-snug ${!notif.read ? "font-semibold" : ""}`}>
                               {notif.message}
                             </p>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[10px] text-[#9AA5B1]">
                               {new Date(notif.created_at).toLocaleTimeString([], {
                                 hour: "2-digit",
                                 minute: "2-digit",
@@ -251,7 +252,7 @@ export default function Header() {
                             </p>
                           </div>
                           {!notif.read && (
-                            <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-1.5"></span>
+                            <span className="w-2 h-2 rounded-full bg-[#0D9488] shrink-0 mt-1.5"></span>
                           )}
                         </div>
                       ))
@@ -262,11 +263,11 @@ export default function Header() {
             </div>
 
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-medium text-slate-800">{user.name}</div>
-              <div className="text-xs text-slate-500">{user.email}</div>
+              <div className="text-sm font-semibold text-[#1F2933] leading-tight">{user.name}</div>
+              <div className="text-xs text-[#9AA5B1] font-mono">{user.email}</div>
             </div>
             <span
-              className={`px-2 py-0.5 text-xs font-semibold uppercase tracking-wider rounded border ${getRoleBadgeColor(
+              className={`px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider rounded-lg border ${getRoleBadgeColor(
                 user.role
               )}`}
             >
@@ -274,7 +275,7 @@ export default function Header() {
             </span>
             <button
               onClick={handleLogout}
-              className="py-1.5 px-3 text-xs font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg border border-slate-200 transition duration-150"
+              className="py-1.5 px-3 text-xs font-medium text-[#52606D] hover:text-red-600 hover:bg-red-50 hover:border-red-200 rounded-lg border border-[#E4E7EB] transition duration-150"
             >
               Sign Out
             </button>
@@ -283,13 +284,13 @@ export default function Header() {
           <div className="flex items-center space-x-3">
             <Link
               href="/login"
-              className="text-sm font-medium text-slate-700 hover:text-slate-900 px-3 py-1.5"
+              className="text-sm font-medium text-[#52606D] hover:text-[#1F2933] px-3 py-1.5 transition"
             >
               Sign In
             </Link>
             <Link
               href="/signup"
-              className="text-sm font-medium bg-blue-600 text-white px-3.5 py-1.5 rounded-lg hover:bg-blue-700 shadow-sm transition"
+              className="text-sm font-medium bg-[#0D9488] hover:bg-[#0F766E] text-white px-3.5 py-1.5 rounded-lg shadow-sm transition active:scale-[0.98]"
             >
               Get Started
             </Link>

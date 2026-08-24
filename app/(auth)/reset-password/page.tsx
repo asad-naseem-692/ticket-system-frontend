@@ -3,8 +3,10 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock, AlertCircle } from "lucide-react";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody } from "@/components/ui/Card";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -75,139 +77,123 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="max-w-md w-full bg-white rounded-xl shadow-sm border border-slate-200 p-8 space-y-6">
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 font-bold text-xl mb-2">
-          🔒
-        </div>
-        <h1 className="text-2xl font-bold text-slate-800">Set New Password</h1>
-        <p className="text-sm text-slate-500">
-          Enter your new password below to update your credentials.
-        </p>
-      </div>
-
-      {error && (
-        <div className="p-3.5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
-          <span className="font-semibold text-red-800">Error:</span>
-          <span>{error}</span>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-            New Password
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (error) setError(null);
-              }}
-              placeholder="••••••••"
-              required
-              disabled={!token}
-              className="w-full pl-3.5 pr-10 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:bg-slate-100"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={!token}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none disabled:opacity-50"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
+    <Card className="max-w-md w-full animate-fadeIn shadow-card">
+      <CardBody className="p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 text-[#0D9488] font-bold text-lg mb-1 shadow-sm">
+            <Lock className="w-6 h-6" />
           </div>
+          <h1 className="text-2xl font-bold text-[#1F2933] tracking-tight">Set new password</h1>
+          <p className="text-sm text-[#52606D]">
+            Enter your new password below to update your account credentials.
+          </p>
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-            Confirm New Password
-          </label>
-          <div className="relative">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                if (error) setError(null);
-              }}
-              placeholder="••••••••"
-              required
-              disabled={!token}
-              className="w-full pl-3.5 pr-10 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:bg-slate-100"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              disabled={!token}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none disabled:opacity-50"
-              aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-            >
-              {showConfirmPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
+        {error && (
+          <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <span className="leading-relaxed">{error}</span>
           </div>
-        </div>
+        )}
 
-        <button
-          type="submit"
-          disabled={loading || !token}
-          className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-medium text-sm rounded-lg transition duration-150 shadow-sm flex items-center justify-center space-x-2"
-        >
-          {loading ? (
-            <>
-              <svg
-                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#52606D]">
+              New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError(null);
+                }}
+                placeholder="••••••••"
+                required
+                disabled={!token}
+                autoComplete="new-password"
+                className="w-full h-10 pl-3.5 pr-10 text-sm text-[#1F2933] bg-white border border-[#E4E7EB] rounded-xl placeholder-[#9AA5B1] transition-all duration-150 ease-out focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 disabled:bg-slate-50 disabled:text-[#9AA5B1] disabled:cursor-not-allowed hover:border-slate-300"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={!token}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#9AA5B1] hover:text-[#52606D] focus:outline-none disabled:opacity-50"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                ></path>
-              </svg>
-              <span>Updating password...</span>
-            </>
-          ) : (
-            <span>Update Password</span>
-          )}
-        </button>
-      </form>
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+          </div>
 
-      <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100">
-        <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
-          Back to sign in
-        </Link>
-      </div>
-    </div>
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#52606D]">
+              Confirm New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (error) setError(null);
+                }}
+                placeholder="••••••••"
+                required
+                disabled={!token}
+                autoComplete="new-password"
+                className="w-full h-10 pl-3.5 pr-10 text-sm text-[#1F2933] bg-white border border-[#E4E7EB] rounded-xl placeholder-[#9AA5B1] transition-all duration-150 ease-out focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 disabled:bg-slate-50 disabled:text-[#9AA5B1] disabled:cursor-not-allowed hover:border-slate-300"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                disabled={!token}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#9AA5B1] hover:text-[#52606D] focus:outline-none disabled:opacity-50"
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            loading={loading}
+            disabled={!token}
+            className="w-full mt-2"
+          >
+            {loading ? "Updating password..." : "Update Password"}
+          </Button>
+        </form>
+
+        <div className="pt-3 text-center text-xs text-[#52606D] border-t border-[#E4E7EB]">
+          <Link
+            href="/login"
+            className="font-semibold text-[#0D9488] hover:text-[#0F766E] hover:underline"
+          >
+            Back to sign in
+          </Link>
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-      <Suspense fallback={<div className="text-slate-500 text-sm">Loading reset form...</div>}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#FAFAFA]">
+      <Suspense fallback={<div className="text-[#52606D] text-sm">Loading reset form...</div>}>
         <ResetPasswordForm />
       </Suspense>
     </div>

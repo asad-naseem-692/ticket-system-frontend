@@ -2,7 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { KeyRound, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 
 interface RequestResetResponse {
   detail: string;
@@ -53,54 +57,53 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-sm border border-slate-200 p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 font-bold text-xl mb-2">
-            🔑
-          </div>
-          <h1 className="text-2xl font-bold text-slate-800">Forgot Password</h1>
-          <p className="text-sm text-slate-500">
-            Enter your registered email address to receive password reset instructions.
-          </p>
-        </div>
-
-        {error && (
-          <div className="p-3.5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
-            <span className="font-semibold text-red-800">Error:</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        {successMsg && (
-          <div className="p-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg space-y-3">
-            <div className="flex items-start space-x-2">
-              <span className="font-semibold text-emerald-900">Success:</span>
-              <span>{successMsg}</span>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#FAFAFA]">
+      <Card className="max-w-md w-full animate-fadeIn shadow-card">
+        <CardBody className="p-8 space-y-6">
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 text-[#0D9488] font-bold text-lg mb-1 shadow-sm">
+              <KeyRound className="w-6 h-6" />
             </div>
-
-            {devResetToken && (
-              <div className="pt-2 border-t border-emerald-200">
-                <p className="text-xs text-emerald-700 font-medium mb-2">
-                  Development Mode: Reset token generated.
-                </p>
-                <Link
-                  href={`/reset-password?token=${encodeURIComponent(devResetToken)}`}
-                  className="inline-flex items-center justify-center w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-lg transition shadow-sm"
-                >
-                  Click Here to Set New Password →
-                </Link>
-              </div>
-            )}
+            <h1 className="text-2xl font-bold text-[#1F2933] tracking-tight">Forgot password?</h1>
+            <p className="text-sm text-[#52606D]">
+              Enter your registered email address to receive password reset instructions.
+            </p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-              Email Address
-            </label>
-            <input
+          {error && (
+            <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{error}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-4 text-xs text-emerald-900 bg-emerald-50 border border-emerald-200/80 rounded-xl space-y-3">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span className="leading-relaxed font-medium">{successMsg}</span>
+              </div>
+
+              {devResetToken && (
+                <div className="pt-3 border-t border-emerald-200/60 space-y-2">
+                  <p className="text-[11px] text-emerald-700 font-semibold uppercase tracking-wider">
+                    Development Mode: Reset Token Ready
+                  </p>
+                  <Link
+                    href={`/reset-password?token=${encodeURIComponent(devResetToken)}`}
+                    className="inline-flex items-center justify-center w-full py-2 px-3 bg-[#0D9488] hover:bg-[#0F766E] text-white font-medium text-xs rounded-lg transition shadow-sm gap-1.5"
+                  >
+                    <span>Proceed to Set New Password</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Email Address"
               type="email"
               value={email}
               onChange={(e) => {
@@ -109,52 +112,31 @@ export default function ForgotPasswordPage() {
               }}
               placeholder="you@example.com"
               required
-              className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              autoComplete="email"
             />
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              loading={loading}
+              className="w-full mt-2"
+            >
+              {loading ? "Sending reset link..." : "Request Password Reset"}
+            </Button>
+          </form>
+
+          <div className="pt-3 text-center text-xs text-[#52606D] border-t border-[#E4E7EB]">
+            Remember your password?{" "}
+            <Link
+              href="/login"
+              className="font-semibold text-[#0D9488] hover:text-[#0F766E] hover:underline"
+            >
+              Back to sign in
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium text-sm rounded-lg transition duration-150 shadow-sm flex items-center justify-center space-x-2"
-          >
-            {loading ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  ></path>
-                </svg>
-                <span>Sending reset link...</span>
-              </>
-            ) : (
-              <span>Request Password Reset</span>
-            )}
-          </button>
-        </form>
-
-        <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100">
-          Remember your password?{" "}
-          <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
-            Back to sign in
-          </Link>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }
