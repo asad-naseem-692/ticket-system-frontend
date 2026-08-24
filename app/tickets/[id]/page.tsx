@@ -21,6 +21,8 @@ import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
 import PriorityBadge from "@/components/PriorityBadge";
 import StatusBadge from "@/components/StatusBadge";
+import CommentBox from "@/components/CommentBox";
+import AttachmentUploader from "@/components/AttachmentUploader";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
 import { getStoredUser, getRedirectPathForRole } from "@/lib/auth";
 import { Ticket, TicketStatus, TicketPriority, User } from "@/lib/types";
@@ -152,7 +154,7 @@ export default function TicketDetailPage() {
     const method = isReassign ? "PATCH" : "POST";
 
     try {
-      const updated = await apiClient<Ticket>(endpoint, {
+      await apiClient<Ticket>(endpoint, {
         method,
         body: JSON.stringify({ agent_id: selectedAgentId }),
       });
@@ -474,6 +476,20 @@ export default function TicketDetailPage() {
                   </div>
                 </div>
               )}
+
+              {/* Attachments Section (FEAT-20, FEAT-21) */}
+              <AttachmentUploader
+                ticketId={ticket.id}
+                attachments={ticket.attachments || []}
+                onAttachmentUploaded={fetchTicket}
+              />
+
+              {/* Conversation & Replies Thread (FEAT-18, FEAT-19) */}
+              <CommentBox
+                ticketId={ticket.id}
+                comments={ticket.comments || []}
+                onCommentAdded={fetchTicket}
+              />
             </div>
           ) : null}
         </main>

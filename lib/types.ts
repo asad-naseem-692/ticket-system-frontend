@@ -31,6 +31,8 @@ export interface Ticket {
   sla_breached: boolean;
   customer?: User;
   assigned_agent?: User | null;
+  comments?: Comment[];
+  attachments?: Attachment[];
 }
 
 export interface Comment {
@@ -51,6 +53,7 @@ export interface Attachment {
   url: string;
   size_bytes: number;
   created_at: string;
+  uploader?: User;
 }
 
 export interface Notification {
