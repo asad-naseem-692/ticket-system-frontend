@@ -66,11 +66,55 @@ rename, abbreviate, or reshape these for convenience.
 - **Comment**: `id, ticket_id, author_id, visibility ("internal"|"public"), content, created_at`
 - **Attachment**: `id, ticket_id, uploaded_by, filename, url, size_bytes, created_at`
 - **Notification**: `id, user_id, ticket_id, type, message, created_at, read (boolean)`
+- **Audit Log**: `id, ticket_id, actor_id, action, timestamp, details`
 
 If a feature needs a field not listed here, use the same conventions and
 flag it clearly in your summary — it needs to be added to this same
 dictionary in **both** `frontend/AGENTS.md` and `backend/AGENTS.md`.
 Never invent or rename a field silently on just one side.
+
+## Design System
+
+All screens and components follow these tokens and shared UI patterns to maintain a clean, trustworthy, light-mode design for daily business operations.
+
+### 1. Color Palette & Tokens
+- **Canvas Background**: `#FAFAFA` (soft off-white)
+- **Cards & Surfaces**: `#FFFFFF` (clean white)
+- **Headings & Primary Text**: `#1F2933` (warm charcoal, never harsh black)
+- **Body & Subtitle Text**: `#52606D`
+- **Muted & Placeholder Text**: `#9AA5B1`
+- **Borders**: `#E4E7EB` (`border-light`)
+- **Primary Accent (Teal)**: `#0D9488` (`primary-600`), hover `#0F766E` (`primary-700`), light tint `#F0FDFA` (`primary-50`)
+- **Priority Badges (Soft background style)**:
+  - Critical: `bg-red-50 text-[#DC2626] border border-red-200/80`
+  - High: `bg-orange-50 text-[#F97316] border border-orange-200/80`
+  - Medium: `bg-amber-50 text-[#D97706] border border-amber-200/80`
+  - Low: `bg-slate-50 text-[#64748B] border border-slate-200`
+- **Status Badges (Soft background style)**:
+  - Open: `bg-blue-50 text-[#2563EB] border border-blue-200/80`
+  - In Progress: `bg-teal-50 text-[#0D9488] border border-teal-200/80`
+  - Resolved: `bg-emerald-50 text-[#059669] border border-emerald-200/80`
+  - Closed: `bg-slate-100 text-[#52606D] border border-slate-200`
+
+### 2. Typography & Hierarchy
+- **Font Family**: Inter (`next/font/google`), loaded via variable `--font-inter`.
+- **Hierarchy**: Weight-based (400 regular, 500 medium, 600 semibold, 700 bold).
+- **Line Height**: 1.5+ for body text and descriptions.
+
+### 3. Spacing & Radius
+- **Border Radius**: 10–12px (`rounded-xl`) on cards, inputs, selects, textareas, and primary buttons.
+- **Card Shadows**: `shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]` default; `hover:shadow-[0_4px_12px_0_rgba(0,0,0,0.06)] hover:-translate-y-0.5` on clickable cards.
+- **Form Controls**: Consistent 40px (`h-10`) height, teal focus ring (`focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20`).
+
+### 4. Shared UI Components (`components/ui/`)
+- **`Button`** (`components/ui/Button.tsx`): Variants: `primary`, `secondary`, `danger`, `ghost`. Supports `sm`, `md`, `lg`, loading state, and icons.
+- **`Card`** (`components/ui/Card.tsx`): White card container with optional `hoverable` lift. Includes `CardHeader`, `CardBody`, and `CardFooter`.
+- **`Badge`** (`components/ui/Badge.tsx`): Standardized soft badge supporting priority and status variants.
+- **`Input`** (`components/ui/Input.tsx`): Rounded-xl input with label, error text, helper text, and teal focus ring.
+- **`Select`** (`components/ui/Select.tsx`): Rounded-xl select dropdown with custom chevron indicator.
+- **`Textarea`** (`components/ui/Textarea.tsx`): Rounded-xl textarea with matching styling and generous padding.
+- **`EmptyState`** (`components/ui/EmptyState.tsx`): Friendly empty state with soft teal icon container, title, description, and action button.
+- **`Skeleton`** (`components/ui/Skeleton.tsx`): Smooth shimmer animation placeholder for async data loading.
 
 ## Never let a change to one feature break a feature it depends on
 Before changing a feature other features rely on, check `specs/features/`
