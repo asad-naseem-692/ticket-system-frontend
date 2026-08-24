@@ -16,6 +16,8 @@ import {
   Shield,
   UserCheck,
   Zap,
+  History,
+  Activity,
 } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
@@ -26,7 +28,7 @@ import AttachmentUploader from "@/components/AttachmentUploader";
 import SLACountdown from "@/components/SLACountdown";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
 import { getStoredUser, getRedirectPathForRole } from "@/lib/auth";
-import { Ticket, TicketStatus, TicketPriority, User } from "@/lib/types";
+import { Ticket, TicketStatus, TicketPriority, User, AuditLog } from "@/lib/types";
 
 export default function TicketDetailPage() {
   const params = useParams();
@@ -36,6 +38,7 @@ export default function TicketDetailPage() {
   const currentUser = getStoredUser();
 
   const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [agents, setAgents] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [updatingStatus, setUpdatingStatus] = useState<boolean>(false);
@@ -54,11 +57,16 @@ export default function TicketDetailPage() {
     setError(null);
 
     try {
-      const data = await apiClient<Ticket>(`/tickets/${ticketId}`);
-      setTicket(data);
-      setSelectedPriority(data.priority);
-      if (data.assigned_agent_id) {
-        setSelectedAgentId(data.assigned_agent_id);
+      const [ticketData, logsData] = await Promise.all([
+        apiClient<Ticket>(`/tickets/${ticketId}`),
+        apiClient<AuditLog[]>(`/tickets/${ticketId}/audit-log`).catch(() => []),
+      ]);
+
+      setTicket(ticketData);
+      setAuditLogs(logsData);
+      setSelectedPriority(ticketData.priority);
+      if (ticketData.assigned_agent_id) {
+        setSelectedAgentId(ticketData.assigned_agent_id);
       }
     } catch (err: unknown) {
       if (err instanceof ApiErrorResponse) {
@@ -102,6 +110,7 @@ export default function TicketDetailPage() {
 
       setTicket((prev) => (prev ? { ...prev, ...updated } : null));
       setSuccessMsg(`Ticket status updated to "${newStatus.replace("_", " ").toUpperCase()}" successfully.`);
+      fetchTicket();
     } catch (err: unknown) {
       if (err instanceof ApiErrorResponse) {
         setError(err.detail);
@@ -130,6 +139,7 @@ export default function TicketDetailPage() {
 
       setTicket((prev) => (prev ? { ...prev, ...updated } : null));
       setSuccessMsg(`Priority manually overridden to "${selectedPriority.toUpperCase()}". SLA deadline recalculated.`);
+      fetchTicket();
     } catch (err: unknown) {
       if (err instanceof ApiErrorResponse) {
         setError(err.detail);
@@ -160,7 +170,6 @@ export default function TicketDetailPage() {
         body: JSON.stringify({ agent_id: selectedAgentId }),
       });
 
-      // Refetch full detail to populate new assigned_agent object
       await fetchTicket();
       setSuccessMsg(isReassign ? "Ticket successfully reassigned to new agent." : "Ticket successfully assigned to agent.");
     } catch (err: unknown) {
@@ -188,6 +197,22 @@ export default function TicketDetailPage() {
     ticket &&
     (ticket.sla_breached ||
       (deadlineDate && deadlineDate < now && ticket.status !== "resolved" && ticket.status !== "closed"));
+
+  const getActionBadge = (action: string) => {
+    switch (action) {
+      case "created":
+        return <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Created</span>;
+      case "assigned":
+      case "reassigned":
+        return <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{action}</span>;
+      case "priority_override":
+        return <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Priority Override</span>;
+      case "closed":
+        return <span className="bg-slate-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Closed</span>;
+      default:
+        return <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Status Update</span>;
+    }
+  };
 
   return (
     <AuthGuard allowedRoles={["customer", "agent", "admin"]}>
@@ -486,6 +511,46 @@ export default function TicketDetailPage() {
                 comments={ticket.comments || []}
                 onCommentAdded={fetchTicket}
               />
+
+              {/* 4. Tamper-Evident Closure & Activity Audit Trail (FEAT-27) */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <History className="w-5 h-5 text-slate-700" />
+                    <h2 className="text-base font-bold text-slate-900">Activity & Audit Trail</h2>
+                  </div>
+                  <span className="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">
+                    {auditLogs.length} events logged
+                  </span>
+                </div>
+
+                <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                  {auditLogs.length === 0 ? (
+                    <div className="text-xs text-slate-400 py-2">No audit events recorded yet.</div>
+                  ) : (
+                    auditLogs.map((log) => (
+                      <div key={log.id} className="relative text-xs space-y-1">
+                        <div className="absolute -left-[27px] top-0.5 w-3 h-3 rounded-full bg-blue-600 border-2 border-white ring-2 ring-blue-100"></div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {getActionBadge(log.action)}
+                          <span className="font-semibold text-slate-900">
+                            {log.actor?.name || "System"}
+                          </span>
+                          <span className="text-slate-400 font-mono">
+                            {new Date(log.timestamp).toLocaleString("en-US", {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })}
+                          </span>
+                        </div>
+                        {log.details && (
+                          <p className="text-slate-600 pl-1 leading-relaxed">{log.details}</p>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
           ) : null}
         </main>
