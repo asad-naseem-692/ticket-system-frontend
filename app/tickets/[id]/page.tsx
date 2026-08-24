@@ -13,6 +13,9 @@ import {
   Archive,
   RefreshCw,
   AlertCircle,
+  Shield,
+  UserCheck,
+  Zap,
 } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
@@ -20,7 +23,7 @@ import PriorityBadge from "@/components/PriorityBadge";
 import StatusBadge from "@/components/StatusBadge";
 import { apiClient, ApiErrorResponse } from "@/lib/api";
 import { getStoredUser, getRedirectPathForRole } from "@/lib/auth";
-import { Ticket, TicketStatus } from "@/lib/types";
+import { Ticket, TicketStatus, TicketPriority, User } from "@/lib/types";
 
 export default function TicketDetailPage() {
   const params = useParams();
@@ -30,8 +33,15 @@ export default function TicketDetailPage() {
   const currentUser = getStoredUser();
 
   const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [agents, setAgents] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [updatingStatus, setUpdatingStatus] = useState<boolean>(false);
+  const [updatingPriority, setUpdatingPriority] = useState<boolean>(false);
+  const [updatingAgent, setUpdatingAgent] = useState<boolean>(false);
+
+  const [selectedAgentId, setSelectedAgentId] = useState<string>("");
+  const [selectedPriority, setSelectedPriority] = useState<TicketPriority>("medium");
+
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -43,6 +53,10 @@ export default function TicketDetailPage() {
     try {
       const data = await apiClient<Ticket>(`/tickets/${ticketId}`);
       setTicket(data);
+      setSelectedPriority(data.priority);
+      if (data.assigned_agent_id) {
+        setSelectedAgentId(data.assigned_agent_id);
+      }
     } catch (err: unknown) {
       if (err instanceof ApiErrorResponse) {
         setError(err.detail);
@@ -56,9 +70,20 @@ export default function TicketDetailPage() {
     }
   }, [ticketId]);
 
+  const fetchAgents = useCallback(async () => {
+    if (currentUser?.role !== "admin") return;
+    try {
+      const data = await apiClient<User[]>("/users/agents");
+      setAgents(data);
+    } catch {
+      // Non-blocking
+    }
+  }, [currentUser?.role]);
+
   useEffect(() => {
     fetchTicket();
-  }, [fetchTicket]);
+    fetchAgents();
+  }, [fetchTicket, fetchAgents]);
 
   const handleStatusChange = async (newStatus: TicketStatus) => {
     if (!ticket) return;
@@ -84,6 +109,67 @@ export default function TicketDetailPage() {
       }
     } finally {
       setUpdatingStatus(false);
+    }
+  };
+
+  const handlePriorityOverride = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ticket) return;
+    setUpdatingPriority(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    try {
+      const updated = await apiClient<Ticket>(`/tickets/${ticket.id}/priority`, {
+        method: "PATCH",
+        body: JSON.stringify({ priority: selectedPriority }),
+      });
+
+      setTicket((prev) => (prev ? { ...prev, ...updated } : null));
+      setSuccessMsg(`Priority manually overridden to "${selectedPriority.toUpperCase()}". SLA deadline recalculated.`);
+    } catch (err: unknown) {
+      if (err instanceof ApiErrorResponse) {
+        setError(err.detail);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to override priority.");
+      }
+    } finally {
+      setUpdatingPriority(false);
+    }
+  };
+
+  const handleAssignAgent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ticket || !selectedAgentId) return;
+    setUpdatingAgent(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    const isReassign = !!ticket.assigned_agent_id;
+    const endpoint = isReassign ? `/tickets/${ticket.id}/reassign` : `/tickets/${ticket.id}/assign`;
+    const method = isReassign ? "PATCH" : "POST";
+
+    try {
+      const updated = await apiClient<Ticket>(endpoint, {
+        method,
+        body: JSON.stringify({ agent_id: selectedAgentId }),
+      });
+
+      // Refetch full detail to populate new assigned_agent object
+      await fetchTicket();
+      setSuccessMsg(isReassign ? "Ticket successfully reassigned to new agent." : "Ticket successfully assigned to agent.");
+    } catch (err: unknown) {
+      if (err instanceof ApiErrorResponse) {
+        setError(err.detail);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to assign agent.");
+      }
+    } finally {
+      setUpdatingAgent(false);
     }
   };
 
@@ -307,6 +393,84 @@ export default function TicketDetailPage() {
                         This ticket is closed and has completed its lifecycle.
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Management Panel (FEAT-14, FEAT-15, FEAT-16, FEAT-17) */}
+              {isAdmin && (
+                <div className="bg-purple-50/50 rounded-xl border border-purple-200 shadow-sm p-6 space-y-6">
+                  <div className="flex items-center gap-2 text-purple-900 font-semibold text-base">
+                    <Shield className="w-5 h-5 text-purple-600" />
+                    <h2>Administrator Controls & Assignment</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Priority Override Form (FEAT-14) */}
+                    <form onSubmit={handlePriorityOverride} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm space-y-3">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                        <Zap className="w-4 h-4 text-amber-500" />
+                        <span>Manual Priority Override</span>
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Correct auto-scored priority. Recalculates SLA deadline immediately.
+                      </p>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <select
+                          value={selectedPriority}
+                          onChange={(e) => setSelectedPriority(e.target.value as TicketPriority)}
+                          className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="critical">Critical (2h SLA)</option>
+                          <option value="high">High (8h SLA)</option>
+                          <option value="medium">Medium (24h SLA)</option>
+                          <option value="low">Low (72h SLA)</option>
+                        </select>
+
+                        <button
+                          type="submit"
+                          disabled={updatingPriority || selectedPriority === ticket.priority}
+                          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-300 text-white font-medium text-xs rounded-lg shadow-sm transition"
+                        >
+                          {updatingPriority ? "Updating..." : "Update Priority"}
+                        </button>
+                      </div>
+                    </form>
+
+                    {/* Agent Assignment Form (FEAT-15, FEAT-16) */}
+                    <form onSubmit={handleAssignAgent} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm space-y-3">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                        <UserCheck className="w-4 h-4 text-blue-500" />
+                        <span>{ticket.assigned_agent_id ? "Reassign Support Agent" : "Assign to Support Agent"}</span>
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Assign this ticket to an agent queue. Only agents can be selected.
+                      </p>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <select
+                          value={selectedAgentId}
+                          onChange={(e) => setSelectedAgentId(e.target.value)}
+                          className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="">-- Select Support Agent --</option>
+                          {agents.map((agent) => (
+                            <option key={agent.id} value={agent.id}>
+                              {agent.name} ({agent.email})
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          type="submit"
+                          disabled={updatingAgent || !selectedAgentId || selectedAgentId === ticket.assigned_agent_id}
+                          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-300 text-white font-medium text-xs rounded-lg shadow-sm transition shrink-0"
+                        >
+                          {updatingAgent ? "Assigning..." : ticket.assigned_agent_id ? "Reassign" : "Assign"}
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               )}
