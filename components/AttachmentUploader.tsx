@@ -99,16 +99,20 @@ export default function AttachmentUploader({
       }
 
       const blob = await res.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = attachment.filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(downloadUrl);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = attachment.filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Download failed.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to download file.");
+      }
     } finally {
       setDownloadingId(null);
     }
@@ -121,93 +125,96 @@ export default function AttachmentUploader({
   };
 
   const getFileIcon = (filename: string) => {
-    const ext = filename.split(".").pop()?.toLowerCase();
-    if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext || "")) {
-      return <FileImage className="w-4 h-4 text-[#0D9488] shrink-0" />;
+    const lower = filename.toLowerCase();
+    if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".gif") || lower.endsWith(".webp") || lower.endsWith(".svg")) {
+      return <FileImage className="w-4 h-4 text-purple-600" />;
     }
-    if (["pdf", "txt", "docx", "xlsx", "csv"].includes(ext || "")) {
-      return <FileText className="w-4 h-4 text-blue-500 shrink-0" />;
+    if (lower.endsWith(".pdf") || lower.endsWith(".txt") || lower.endsWith(".doc") || lower.endsWith(".docx")) {
+      return <FileText className="w-4 h-4 text-blue-600" />;
     }
-    return <File className="w-4 h-4 text-[#9AA5B1] shrink-0" />;
+    return <File className="w-4 h-4 text-gray-500" />;
   };
 
   return (
-    <Card className="shadow-card p-4 sm:p-6 space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <Card className="border border-slate-200 shadow-card overflow-hidden">
+      <CardHeader className="p-4 sm:px-6 border-b border-slate-200 bg-slate-50">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-teal-50 text-[#0D9488]">
+          <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
             <Paperclip className="w-4 h-4" />
           </div>
-          <h2 className="text-base font-semibold text-[#1F2933]">Attachments & Documents</h2>
-          <span className="text-xs bg-slate-100 text-[#52606D] font-bold px-2 py-0.5 rounded-lg">
+          <h2 className="text-base font-bold text-gray-900">Attachments & Documents</h2>
+          <span className="text-xs bg-slate-200 text-gray-800 font-bold px-2 py-0.5 rounded-lg">
             {attachments.length}
           </span>
         </div>
-      </div>
+      </CardHeader>
 
-      {error && (
-        <div className="p-3 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
-          <span>{error}</span>
-        </div>
-      )}
+      <CardBody className="p-4 sm:p-6 space-y-4">
+        {error && (
+          <div className="p-3 text-xs text-red-800 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <span>{error}</span>
+          </div>
+        )}
 
-      {success && (
-        <div className="p-3 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 rounded-xl flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-          <span>{success}</span>
-        </div>
-      )}
+        {success && (
+          <div className="p-3 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <span>{success}</span>
+          </div>
+        )}
 
-      {/* Attachment List */}
-      <div className="space-y-2">
+        {/* List of Attachments */}
         {attachments.length === 0 ? (
-          <div className="text-center py-4 text-[#9AA5B1] text-xs">
-            No files attached to this ticket.
+          <div className="text-center py-6 text-gray-500 text-xs font-medium">
+            No files or screenshots attached to this ticket.
           </div>
         ) : (
-          attachments.map((att) => (
-            <div
-              key={att.id}
-              className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-[#E4E7EB] text-xs hover:bg-slate-100/80 transition"
-            >
-              <div className="flex items-center gap-2.5 overflow-hidden">
-                {getFileIcon(att.filename)}
-                <div className="overflow-hidden">
-                  <p className="font-medium text-[#1F2933] truncate" title={att.filename}>
-                    {att.filename}
-                  </p>
-                  <p className="text-[11px] text-[#9AA5B1]">
-                    {formatFileSize(att.size_bytes)} • Uploaded by {att.uploader?.name || "User"} on{" "}
-                    {new Date(att.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleDownload(att)}
-                disabled={downloadingId === att.id}
-                leftIcon={downloadingId === att.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5 text-[#0D9488]" />}
-                className="shrink-0"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {attachments.map((att) => (
+              <div
+                key={att.id}
+                className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:bg-slate-100/80 transition"
               >
-                <span>{downloadingId === att.id ? "Downloading..." : "Download"}</span>
-              </Button>
-            </div>
-          ))
-        )}
-      </div>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="p-2 rounded-lg bg-white border border-slate-200 shrink-0">
+                    {getFileIcon(att.filename)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-gray-900 truncate" title={att.filename}>
+                      {att.filename}
+                    </p>
+                    <p className="text-[10px] text-gray-500 font-medium">
+                      {formatFileSize(att.size_bytes)} • {new Date(att.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
 
-      {/* Upload Zone */}
-      <form onSubmit={handleUpload} className="pt-3 border-t border-[#E4E7EB] space-y-3">
-        <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleDownload(att)}
+                  disabled={downloadingId === att.id}
+                  className="h-8 px-2.5 shrink-0"
+                >
+                  {downloadingId === att.id ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Download className="w-3.5 h-3.5 text-gray-600" />
+                  )}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Upload Form */}
+        <form onSubmit={handleUpload} className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center gap-3">
           <input
-            ref={fileInputRef}
             type="file"
+            ref={fileInputRef}
             onChange={handleFileChange}
-            className="block w-full text-xs text-[#52606D] file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#0D9488] hover:file:bg-teal-100 cursor-pointer"
+            className="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border file:border-slate-300 file:text-xs file:font-bold file:bg-white file:text-gray-700 hover:file:bg-slate-50 cursor-pointer"
           />
 
           <Button
@@ -217,12 +224,12 @@ export default function AttachmentUploader({
             loading={uploading}
             disabled={!selectedFile}
             leftIcon={<Upload className="w-3.5 h-3.5" />}
-            className="w-full sm:w-auto shrink-0"
+            className="w-full sm:w-auto shrink-0 font-bold"
           >
-            {uploading ? "Uploading..." : "Attach File"}
+            <span>Upload</span>
           </Button>
-        </div>
-      </form>
+        </form>
+      </CardBody>
     </Card>
   );
 }

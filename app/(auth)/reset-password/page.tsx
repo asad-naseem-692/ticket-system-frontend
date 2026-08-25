@@ -77,20 +77,20 @@ function ResetPasswordForm() {
   };
 
   return (
-    <Card className="max-w-md w-full animate-fadeIn shadow-card">
+    <Card className="max-w-md w-full animate-fadeIn border border-slate-200 shadow-card">
       <CardBody className="p-8 space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 text-[#0D9488] font-bold text-lg mb-1 shadow-sm">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 text-[#0D9488] font-bold text-lg mb-1 shadow-sm border border-teal-100">
             <Lock className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-[#1F2933] tracking-tight">Set new password</h1>
-          <p className="text-sm text-[#52606D]">
+          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Set new password</h1>
+          <p className="text-sm text-gray-600 font-medium">
             Enter your new password below to update your account credentials.
           </p>
         </div>
 
         {error && (
-          <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-start gap-2.5">
+          <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 font-medium">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span className="leading-relaxed">{error}</span>
           </div>
@@ -98,7 +98,7 @@ function ResetPasswordForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#52606D]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
               New Password
             </label>
             <div className="relative">
@@ -113,13 +113,13 @@ function ResetPasswordForm() {
                 required
                 disabled={!token}
                 autoComplete="new-password"
-                className="w-full h-10 pl-3.5 pr-10 text-sm text-[#1F2933] bg-white border border-[#E4E7EB] rounded-xl placeholder-[#9AA5B1] transition-all duration-150 ease-out focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 disabled:bg-slate-50 disabled:text-[#9AA5B1] disabled:cursor-not-allowed hover:border-slate-300"
+                className="w-full h-10 pl-3.5 pr-10 text-sm text-gray-900 bg-white border border-slate-300 rounded-xl placeholder-gray-400 transition-all duration-150 ease-out focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 disabled:bg-slate-50 disabled:text-gray-400 disabled:cursor-not-allowed hover:border-slate-400"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={!token}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#9AA5B1] hover:text-[#52606D] focus:outline-none disabled:opacity-50"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-700 focus:outline-none disabled:opacity-50"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -132,7 +132,7 @@ function ResetPasswordForm() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#52606D]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
               Confirm New Password
             </label>
             <div className="relative">
@@ -147,13 +147,13 @@ function ResetPasswordForm() {
                 required
                 disabled={!token}
                 autoComplete="new-password"
-                className="w-full h-10 pl-3.5 pr-10 text-sm text-[#1F2933] bg-white border border-[#E4E7EB] rounded-xl placeholder-[#9AA5B1] transition-all duration-150 ease-out focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 disabled:bg-slate-50 disabled:text-[#9AA5B1] disabled:cursor-not-allowed hover:border-slate-300"
+                className="w-full h-10 pl-3.5 pr-10 text-sm text-gray-900 bg-white border border-slate-300 rounded-xl placeholder-gray-400 transition-all duration-150 ease-out focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 disabled:bg-slate-50 disabled:text-gray-400 disabled:cursor-not-allowed hover:border-slate-400"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 disabled={!token}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#9AA5B1] hover:text-[#52606D] focus:outline-none disabled:opacity-50"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-700 focus:outline-none disabled:opacity-50"
                 aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
               >
                 {showConfirmPassword ? (
@@ -171,16 +171,16 @@ function ResetPasswordForm() {
             size="md"
             loading={loading}
             disabled={!token}
-            className="w-full mt-2"
+            className="w-full mt-2 font-bold"
           >
             {loading ? "Updating password..." : "Update Password"}
           </Button>
         </form>
 
-        <div className="pt-3 text-center text-xs text-[#52606D] border-t border-[#E4E7EB]">
+        <div className="pt-3 text-center text-xs text-gray-600 border-t border-slate-200 font-medium">
           <Link
             href="/login"
-            className="font-semibold text-[#0D9488] hover:text-[#0F766E] hover:underline"
+            className="font-bold text-[#0D9488] hover:text-[#0F766E] hover:underline"
           >
             Back to sign in
           </Link>
@@ -193,7 +193,7 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#FAFAFA]">
-      <Suspense fallback={<div className="text-[#52606D] text-sm">Loading reset form...</div>}>
+      <Suspense fallback={<div className="text-gray-600 text-sm font-medium">Loading reset form...</div>}>
         <ResetPasswordForm />
       </Suspense>
     </div>

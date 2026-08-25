@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, AlertCircle, CheckCircle2, Clock, ShieldCheck, Zap } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -44,6 +44,37 @@ export default function CreateTicketPage() {
     }));
     if (error) setError(null);
   };
+
+  const getSlaHint = (category: string) => {
+    switch (category) {
+      case "Emergency":
+        return {
+          badge: "Critical (2h SLA)",
+          color: "bg-red-50 text-red-700 border-red-200",
+          text: "System outages, security breaches, and emergency blockers are routed with highest priority.",
+        };
+      case "Billing":
+        return {
+          badge: "High (8h SLA)",
+          color: "bg-orange-50 text-orange-700 border-orange-200",
+          text: "Payment failures, invoices, and subscription issues are resolved within 8 business hours.",
+        };
+      case "Technical Issue":
+        return {
+          badge: "Medium (24h SLA)",
+          color: "bg-amber-50 text-amber-800 border-amber-200",
+          text: "Application errors and functional bugs are investigated within 24 hours.",
+        };
+      default:
+        return {
+          badge: "Low (72h SLA)",
+          color: "bg-slate-100 text-slate-700 border-slate-300",
+          text: "General inquiries and feedback are reviewed within 72 hours.",
+        };
+    }
+  };
+
+  const currentSlaHint = getSlaHint(formData.category);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,30 +140,30 @@ export default function CreateTicketPage() {
           <div className="flex items-center space-x-3">
             <Link
               href="/my-tickets"
-              className="inline-flex items-center justify-center p-2 rounded-xl text-[#52606D] hover:text-[#1F2933] bg-white border border-[#E4E7EB] hover:bg-slate-50 transition shadow-sm"
+              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-600 hover:text-gray-900 bg-white border border-slate-300 hover:bg-slate-50 transition shadow-sm"
               aria-label="Back to tickets"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-[#1F2933] tracking-tight">Create Support Ticket</h1>
-              <p className="text-sm text-[#52606D]">
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Create Support Ticket</h1>
+              <p className="text-sm text-gray-600 font-medium">
                 Submit a new complaint or issue. Our automated system will score its priority and calculate SLA deadlines.
               </p>
             </div>
           </div>
 
-          <Card className="shadow-card">
+          <Card className="border border-slate-200 shadow-card">
             <CardBody className="p-6 sm:p-8 space-y-6">
               {error && (
-                <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-start gap-2.5">
+                <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 font-medium">
                   <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                   <span className="leading-relaxed">{error}</span>
                 </div>
               )}
 
               {success && (
-                <div className="p-3.5 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 rounded-xl flex items-start gap-2.5">
+                <div className="p-3.5 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2.5 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="leading-relaxed">{success}</span>
                 </div>
@@ -149,20 +180,31 @@ export default function CreateTicketPage() {
                   required
                 />
 
-                <Select
-                  label="Category *"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  helperText="Select the closest category to ensure proper automated prioritization and SLA assignment."
-                  required
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </Select>
+                <div className="space-y-2">
+                  <Select
+                    label="Category *"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </Select>
+
+                  {/* Dynamic SLA Expectation Hint */}
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2.5 text-xs">
+                    <span className={`px-2 py-0.5 rounded-md font-bold text-[11px] border shrink-0 ${currentSlaHint.color}`}>
+                      {currentSlaHint.badge}
+                    </span>
+                    <span className="text-gray-600 font-medium leading-relaxed">
+                      {currentSlaHint.text}
+                    </span>
+                  </div>
+                </div>
 
                 <Textarea
                   label="Detailed Description *"
@@ -174,7 +216,7 @@ export default function CreateTicketPage() {
                   required
                 />
 
-                <div className="pt-3 flex items-center justify-end space-x-3 border-t border-[#E4E7EB]">
+                <div className="pt-3 flex items-center justify-end space-x-3 border-t border-slate-200">
                   <Link href="/my-tickets">
                     <Button variant="secondary" size="md" type="button">
                       Cancel
@@ -186,6 +228,7 @@ export default function CreateTicketPage() {
                     variant="primary"
                     size="md"
                     loading={loading}
+                    className="font-bold"
                   >
                     {loading ? "Submitting ticket..." : "Submit Ticket"}
                   </Button>

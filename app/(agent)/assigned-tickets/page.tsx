@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Search, Filter, RefreshCw, AlertCircle } from "lucide-react";
+import { Search, Filter, RefreshCw, AlertCircle, Inbox, Clock, CheckCircle2 } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
 import TicketCard from "@/components/TicketCard";
@@ -70,8 +70,8 @@ export default function AssignedTicketsPage() {
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fadeIn">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-[#1F2933] tracking-tight">Assigned Tickets Queue</h1>
-              <p className="text-sm text-[#52606D]">
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Assigned Tickets Queue</h1>
+              <p className="text-sm text-gray-600 font-medium">
                 Manage, diagnose, and resolve customer support tickets assigned to you.
               </p>
             </div>
@@ -81,7 +81,7 @@ export default function AssignedTicketsPage() {
               size="sm"
               onClick={fetchAssignedTickets}
               disabled={loading}
-              leftIcon={<RefreshCw className={`w-4 h-4 text-[#52606D] ${loading ? "animate-spin text-[#0D9488]" : ""}`} />}
+              leftIcon={<RefreshCw className={`w-4 h-4 text-gray-600 ${loading ? "animate-spin text-[#0D9488]" : ""}`} />}
               className="self-start sm:self-auto"
             >
               <span>Refresh Queue</span>
@@ -89,55 +89,70 @@ export default function AssignedTicketsPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Card className="shadow-card">
-              <CardBody className="p-4">
-                <p className="text-xs font-semibold text-[#9AA5B1] uppercase tracking-wider">Assigned</p>
-                <p className="text-2xl font-bold text-[#1F2933] mt-1">{tickets.length}</p>
+            <Card className="border border-slate-200 shadow-card">
+              <CardBody className="p-4 space-y-1">
+                <div className="flex items-center justify-between text-gray-600">
+                  <span className="text-xs font-bold uppercase tracking-wider">Assigned</span>
+                  <Inbox className="w-4 h-4" />
+                </div>
+                <div className="text-3xl font-extrabold text-gray-900">{tickets.length}</div>
               </CardBody>
             </Card>
-            <Card className="shadow-card">
-              <CardBody className="p-4">
-                <p className="text-xs font-semibold text-[#2563EB] uppercase tracking-wider">Open</p>
-                <p className="text-2xl font-bold text-[#2563EB] mt-1">{openCount}</p>
+
+            <Card className="border border-slate-200 shadow-card">
+              <CardBody className="p-4 space-y-1">
+                <div className="flex items-center justify-between text-blue-700">
+                  <span className="text-xs font-bold uppercase tracking-wider">Open</span>
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div className="text-3xl font-extrabold text-blue-700">{openCount}</div>
               </CardBody>
             </Card>
-            <Card className="shadow-card">
-              <CardBody className="p-4">
-                <p className="text-xs font-semibold text-[#0D9488] uppercase tracking-wider">In Progress</p>
-                <p className="text-2xl font-bold text-[#0D9488] mt-1">{inProgressCount}</p>
+
+            <Card className="border border-slate-200 shadow-card">
+              <CardBody className="p-4 space-y-1">
+                <div className="flex items-center justify-between text-indigo-700">
+                  <span className="text-xs font-bold uppercase tracking-wider">In Progress</span>
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div className="text-3xl font-extrabold text-indigo-700">{inProgressCount}</div>
               </CardBody>
             </Card>
-            <Card className="shadow-card">
-              <CardBody className="p-4">
-                <p className="text-xs font-semibold text-[#059669] uppercase tracking-wider">Resolved</p>
-                <p className="text-2xl font-bold text-[#059669] mt-1">{resolvedCount}</p>
+
+            <Card className="border border-slate-200 shadow-card">
+              <CardBody className="p-4 space-y-1">
+                <div className="flex items-center justify-between text-emerald-700">
+                  <span className="text-xs font-bold uppercase tracking-wider">Resolved</span>
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div className="text-3xl font-extrabold text-emerald-700">{resolvedCount}</div>
               </CardBody>
             </Card>
           </div>
 
-          <Card className="shadow-card">
+          <Card className="border border-slate-200 shadow-card">
             <CardBody className="p-4 flex flex-col sm:flex-row gap-3 items-center justify-between">
               <div className="relative w-full sm:w-80">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9AA5B1]" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search assigned tickets..."
-                  className="w-full h-10 pl-10 pr-4 text-sm text-[#1F2933] border border-[#E4E7EB] rounded-xl focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 bg-white placeholder-[#9AA5B1] transition"
+                  className="w-full h-10 pl-10 pr-4 text-sm text-gray-900 border border-slate-300 rounded-xl focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 bg-white placeholder-gray-400 hover:border-slate-400 transition"
                 />
               </div>
 
               <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                <div className="flex items-center gap-1.5 text-xs text-[#52606D]">
-                  <Filter className="w-3.5 h-3.5 text-[#9AA5B1]" />
-                  <span className="font-medium">Filters:</span>
+                <div className="flex items-center gap-1.5 text-xs text-gray-700">
+                  <Filter className="w-3.5 h-3.5 text-gray-500" />
+                  <span className="font-bold">Filters:</span>
                 </div>
 
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="h-9 px-3 text-xs text-[#1F2933] border border-[#E4E7EB] rounded-xl bg-white focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20"
+                  className="h-10 px-3 text-xs font-semibold text-gray-800 border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 hover:border-slate-400 transition cursor-pointer"
                 >
                   <option value="all">All Statuses</option>
                   <option value="open">Open</option>
@@ -149,7 +164,7 @@ export default function AssignedTicketsPage() {
                 <select
                   value={priorityFilter}
                   onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="h-9 px-3 text-xs text-[#1F2933] border border-[#E4E7EB] rounded-xl bg-white focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20"
+                  className="h-10 px-3 text-xs font-semibold text-gray-800 border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 hover:border-slate-400 transition cursor-pointer"
                 >
                   <option value="all">All Priorities</option>
                   <option value="critical">Critical</option>
@@ -161,39 +176,39 @@ export default function AssignedTicketsPage() {
             </CardBody>
           </Card>
 
-          {error ? (
-            <Card className="p-8 text-center space-y-3 bg-red-50/50 border-red-200">
-              <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
-              <p className="text-sm font-medium text-red-800">{error}</p>
-              <Button variant="danger" size="sm" onClick={fetchAssignedTickets}>
-                Retry
-              </Button>
-            </Card>
-          ) : loading ? (
-            <div className="space-y-4">
+          {error && (
+            <div className="p-4 text-xs font-medium text-red-800 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="p-5 space-y-3">
-                  <Skeleton className="h-4 w-1/4" />
-                  <Skeleton className="h-5 w-3/4" />
-                  <Skeleton className="h-3 w-full" />
+                <Card key={i} className="p-5 border border-slate-200">
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                  </div>
                 </Card>
               ))}
             </div>
           ) : filteredTickets.length === 0 ? (
             <EmptyState
-              title={
-                searchTerm || statusFilter !== "all" || priorityFilter !== "all"
-                  ? "No tickets match your filters"
-                  : "No assigned tickets"
-              }
+              title="Queue is clear"
               description={
                 searchTerm || statusFilter !== "all" || priorityFilter !== "all"
-                  ? "No tickets in your queue match the selected search or filter criteria."
-                  : "You currently have no tickets assigned to your queue. All caught up!"
+                  ? "No assigned tickets match the active filters."
+                  : "You have no tickets currently in your assigned workload queue."
               }
             />
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
+              <div className="text-xs font-bold text-gray-600">
+                Showing {filteredTickets.length} of {tickets.length} assigned tickets
+              </div>
               {filteredTickets.map((ticket) => (
                 <TicketCard key={ticket.id} ticket={ticket} />
               ))}

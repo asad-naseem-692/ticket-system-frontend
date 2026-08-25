@@ -58,40 +58,40 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#FAFAFA]">
-      <Card className="max-w-md w-full animate-fadeIn shadow-card">
+      <Card className="max-w-md w-full animate-fadeIn border border-slate-200 shadow-card">
         <CardBody className="p-8 space-y-6">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 text-[#0D9488] font-bold text-lg mb-1 shadow-sm">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 text-[#0D9488] font-bold text-lg mb-1 shadow-sm border border-teal-100">
               <KeyRound className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-bold text-[#1F2933] tracking-tight">Forgot password?</h1>
-            <p className="text-sm text-[#52606D]">
+            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Forgot password?</h1>
+            <p className="text-sm text-gray-600 font-medium">
               Enter your registered email address to receive password reset instructions.
             </p>
           </div>
 
           {error && (
-            <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200/80 rounded-xl flex items-start gap-2.5">
+            <div className="p-3.5 text-xs text-red-800 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 font-medium">
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
               <span className="leading-relaxed">{error}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-4 text-xs text-emerald-900 bg-emerald-50 border border-emerald-200/80 rounded-xl space-y-3">
+            <div className="p-4 text-xs text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-xl space-y-3">
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="leading-relaxed font-medium">{successMsg}</span>
+                <span className="leading-relaxed font-semibold">{successMsg}</span>
               </div>
 
               {devResetToken && (
-                <div className="pt-3 border-t border-emerald-200/60 space-y-2">
-                  <p className="text-[11px] text-emerald-700 font-semibold uppercase tracking-wider">
+                <div className="pt-3 border-t border-emerald-200 space-y-2">
+                  <p className="text-[11px] text-emerald-800 font-bold uppercase tracking-wider">
                     Development Mode: Reset Token Ready
                   </p>
                   <Link
                     href={`/reset-password?token=${encodeURIComponent(devResetToken)}`}
-                    className="inline-flex items-center justify-center w-full py-2 px-3 bg-[#0D9488] hover:bg-[#0F766E] text-white font-medium text-xs rounded-lg transition shadow-sm gap-1.5"
+                    className="inline-flex items-center justify-center w-full py-2 px-3 bg-[#0D9488] hover:bg-[#0F766E] text-white font-bold text-xs rounded-xl transition shadow-sm gap-1.5"
                   >
                     <span>Proceed to Set New Password</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -120,17 +120,17 @@ export default function ForgotPasswordPage() {
               variant="primary"
               size="md"
               loading={loading}
-              className="w-full mt-2"
+              className="w-full mt-2 font-bold"
             >
               {loading ? "Sending reset link..." : "Request Password Reset"}
             </Button>
           </form>
 
-          <div className="pt-3 text-center text-xs text-[#52606D] border-t border-[#E4E7EB]">
+          <div className="pt-3 text-center text-xs text-gray-600 border-t border-slate-200 font-medium">
             Remember your password?{" "}
             <Link
               href="/login"
-              className="font-semibold text-[#0D9488] hover:text-[#0F766E] hover:underline"
+              className="font-bold text-[#0D9488] hover:text-[#0F766E] hover:underline"
             >
               Back to sign in
             </Link>

@@ -51,11 +51,11 @@ export default function SLACountdown({
   if (isResolvedOrClosed) {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 font-medium rounded-lg ${
+        className={`inline-flex items-center gap-1.5 font-bold rounded-lg ${
           slaBreached
-            ? "bg-red-50 text-[#DC2626] border border-red-200/80"
-            : "bg-emerald-50 text-[#059669] border border-emerald-200/80"
-        } ${compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"}`}
+            ? "bg-red-50 text-red-700 border border-red-200"
+            : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+        } ${compact ? "px-2.5 py-0.5 text-xs" : "px-3 py-1 text-xs"}`}
       >
         <CheckCircle2 className="w-3.5 h-3.5" />
         <span>{slaBreached ? "Resolved (Breached SLA)" : "Resolved within SLA"}</span>
@@ -66,11 +66,11 @@ export default function SLACountdown({
   if (isOverdue) {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 font-semibold rounded-lg bg-red-50 text-[#DC2626] border border-red-200/80 ${
-          compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
+        className={`inline-flex items-center gap-1.5 font-bold rounded-lg bg-red-50 text-red-700 border border-red-200 ${
+          compact ? "px-2.5 py-0.5 text-xs" : "px-3 py-1 text-xs"
         }`}
       >
-        <AlertTriangle className="w-3.5 h-3.5 text-[#DC2626] shrink-0" />
+        <AlertTriangle className="w-3.5 h-3.5 text-red-700 shrink-0" />
         <span>SLA Breached (+{formatDuration(timeLeftMs)} overdue)</span>
       </div>
     );
@@ -79,11 +79,11 @@ export default function SLACountdown({
   if (isAtRisk) {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 font-medium rounded-lg bg-amber-50 text-[#D97706] border border-amber-200/80 ${
-          compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
+        className={`inline-flex items-center gap-1.5 font-bold rounded-lg bg-amber-50 text-amber-800 border border-amber-200 ${
+          compact ? "px-2.5 py-0.5 text-xs" : "px-3 py-1 text-xs"
         }`}
       >
-        <AlertCircle className="w-3.5 h-3.5 text-[#D97706] shrink-0" />
+        <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
         <span>{formatDuration(timeLeftMs)} left (At Risk)</span>
       </div>
     );
@@ -91,11 +91,11 @@ export default function SLACountdown({
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 font-medium rounded-lg bg-blue-50 text-[#2563EB] border border-blue-200/80 ${
-        compact ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"
+      className={`inline-flex items-center gap-1.5 font-bold rounded-lg bg-blue-50 text-blue-700 border border-blue-200 ${
+        compact ? "px-2.5 py-0.5 text-xs" : "px-3 py-1 text-xs"
       }`}
     >
-      <Clock className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+      <Clock className="w-3.5 h-3.5 text-blue-700 shrink-0" />
       <span>{formatDuration(timeLeftMs)} remaining</span>
     </div>
   );
